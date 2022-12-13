@@ -1,0 +1,104 @@
+name: Integration Test
+
+on:
+  push:
+    branches:
+      - master
+      - "push-action/**"
+  pull_request:
+
+concurrency:
+  group: integration-test-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node and pnpm
+        uses: silverhand-io/actions-node-pnpm-run-steps@v2
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Package
+        run: ./.scripts/package.sh
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-${{ github.sha }}
+          path: /tmp/logto.tar.gz
+          retention-days: 3
+
+  run-logto:
+    needs: package
+
+    strategy:
+      matrix:
+        node_version: [16, 18]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: tests
+
+      - name: Copy lockfile
+        run: |
+          cp tests/pnpm-lock.yaml ./
+          cp tests/package.json ./
+
+      - name: Setup Node and pnpm
+        uses: silverhand-io/actions-node-pnpm-run-steps@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          run-install: false
+
+      # Setup integration test
+      - name: Install dependencies
+        run: |
+          cd tests
+          pnpm i
+          pnpm prepack
+          # Install Chromium
+          cd packages/integration-tests/node_modules/puppeteer
+          pnpm postinstall
+
+      # Setup environment
+      - name: Setup Postgres
+        uses: ikalnytskyi/action-setup-postgres@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: integration-test-${{ github.sha }}
+
+      - name: Extract
+        working-directory: tests
+        run: |
+          npm run cli init -- -p ../logto --db postgres://postgres:postgres@localhost:5432/postgres --no-oc --du ../logto.tar.gz
+      
+      - name: Add mock connectors
+        working-directory: tests
+        run: |
+          npm run cli connector add @logto/connector-mock-sms @logto/connector-mock-email @logto/connector-mock-standard-email @logto/connector-mock-social -- -p ../logto
+
+      - name: Run Logto
+        working-directory: logto/
+        run: npm start &
+        env:
+          INTEGRATION_TEST: true
+
+      - name: Sleep for 5 seconds
+        run: sleep 5
+
+      # Test
+      - name: Run tests
+        run: |
+          cd tests/packages/integration-tests
+          pnpm start
+        env:
+          INTEGRATION_TESTS_LOGTO_URL: http://localhost:3001

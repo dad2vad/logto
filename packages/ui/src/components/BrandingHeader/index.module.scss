@@ -1,0 +1,46 @@
+@use '@/scss/underscore' as _;
+
+$logo-height: 50px;
+
+.container {
+  width: 100%;
+  @include _.flex-column;
+}
+
+.logo {
+  height: $logo-height;
+  width: auto;
+  @include _.image-align-center;
+}
+
+.headline {
+  text-align: center;
+  color: var(--color-type-primary);
+  @include _.multi-line-ellipsis(2);
+}
+
+:global(body.mobile) {
+  .container {
+    height: 15vh;
+    min-height: 92px;
+    max-height: 148px;
+  }
+
+  .logo:not(:last-child) {
+    margin-bottom: _.unit(2);
+  }
+
+  .headline {
+    font: var(--font-title-1);
+  }
+}
+
+:global(body.desktop) {
+  .logo:not(:last-child) {
+    margin-bottom: _.unit(3);
+  }
+
+  .headline {
+    font: var(--font-title-2);
+  }
+}

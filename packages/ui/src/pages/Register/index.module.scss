@@ -1,0 +1,29 @@
+@use '@/scss/underscore' as _;
+
+.main,
+.divider,
+.otherMethods {
+  margin-bottom: _.unit(4);
+}
+
+.createAccount {
+  margin-top: _.unit(2);
+  text-align: center;
+}
+
+.placeHolder {
+  flex: 1;
+}
+
+
+:global(body.mobile) {
+  .createAccount {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+:global(body.desktop) {
+  .placeHolder {
+    flex: 0;
+  }
+}

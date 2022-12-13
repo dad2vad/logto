@@ -1,0 +1,79 @@
+@use '@/scss/underscore' as _;
+
+.backLink {
+  margin: _.unit(1) 0 0 _.unit(1);
+  user-select: none;
+}
+
+.resourceLayout {
+  height: 100%;
+}
+
+.header {
+  padding: _.unit(6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  > *:not(:first-child) {
+    margin-left: _.unit(6);
+  }
+
+  .avatar {
+    margin-left: _.unit(2);
+    border-radius: 8px;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+  }
+
+  .metadata {
+    flex: 1;
+
+    > div {
+      display: flex;
+      align-items: center;
+
+      > *:not(:last-child) {
+        margin-right: _.unit(2);
+      }
+    }
+
+    .name {
+      font: var(--font-title-large);
+      color: var(--color-text);
+    }
+
+    .suspended {
+      background: var(--color-error-container);
+      color: var(--color-text);
+      font: var(--font-label-medium);
+      padding: _.unit(0.5) _.unit(1.5);
+      border-radius: 10px;
+    }
+
+    .username {
+      color: var(--color-text-secondary);
+      font: var(--font-subhead-2);
+    }
+
+    .text {
+      font: var(--font-subhead-2);
+      color: var(--color-text-secondary);
+    }
+
+    .verticalBar {
+      @include _.vertical-bar;
+      height: 12px;
+    }
+  }
+
+  .moreIcon {
+    color: var(--color-text-secondary);
+  }
+}
+
+
+.resetIcon {
+  color: var(--color-text-secondary);
+}

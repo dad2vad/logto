@@ -1,0 +1,40 @@
+@use '@/scss/underscore' as _;
+
+.link {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+
+  &.primary {
+    color: var(--color-brand-default);
+    text-decoration: none;
+    font: var(--font-label-2);
+
+    &:active {
+      color: var(--color-brand-hover);
+    }
+  }
+
+  &.secondary {
+    color: var(--color-type-secondary);
+    text-decoration: underline;
+  }
+}
+
+
+:global(body.desktop) {
+  .link {
+    &.primary:hover {
+      color: var(--color-brand-hover);
+    }
+
+    &.primary:focus-visible {
+      outline: _.border(var(--color-overlay-brand-focused));
+    }
+
+    &.secondary:hover,
+    &.secondary:active {
+      color: var(--color-brand-default);
+    }
+  }
+}
